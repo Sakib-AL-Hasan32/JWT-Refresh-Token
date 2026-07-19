@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: refresh-token
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/task_management_db
+    username: sakib
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  jwt:
+    secret-key: This_is_my_secret_key_afdjaasdfdsf_adjsfhadjsf_aksdjkfh_akjdfhajdsf_asjdlfhadjkf_ajdfhshaf_adisjfadsjf_alkfdjakdf_asldkjfakdf_adslkfja
+    expiration: 1m
