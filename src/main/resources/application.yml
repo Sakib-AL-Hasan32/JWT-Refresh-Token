@@ -12,6 +12,6 @@ spring:
     hibernate:
       ddl-auto: update
 
-  jwt:
-    secret-key: This_is_my_secret_key_afdjaasdfdsf_adjsfhadjsf_aksdjkfh_akjdfhajdsf_asjdlfhadjkf_ajdfhshaf_adisjfadsjf_alkfdjakdf_asldkjfakdf_adslkfja
-    expiration: 1m
+jwt:
+  secret-key: This_is_my_secret_key_afdjaasdfdsf_adjsfhadjsf_aksdjkfh_akjdfhajdsf_asjdlfhadjkf_ajdfhshaf_adisjfadsjf_alkfdjakdf_asldkjfakdf_adslkfja
+  expiration: 1m
