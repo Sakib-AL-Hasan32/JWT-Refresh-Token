@@ -6,7 +6,7 @@ import com.refresh_token.auth.entity.Role;
 import com.refresh_token.auth.entity.User;
 import com.refresh_token.auth.repository.UserRepository;
 import com.refresh_token.auth.security.service.CustomUserDetailsService;
-import com.refresh_token.common.constants.ApiMessage;
+import com.refresh_token.common.constants.ApiMessages;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,7 +27,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     @NullMarked
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(ApiMessage.Error.USER_NOT_FOUND));
+                .orElseThrow(() -> new UsernameNotFoundException(ApiMessages.Error.USER_NOT_FOUND));
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
