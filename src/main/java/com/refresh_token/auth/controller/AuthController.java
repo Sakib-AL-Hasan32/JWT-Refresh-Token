@@ -1,6 +1,8 @@
 package com.refresh_token.auth.controller;
 
+import com.refresh_token.auth.dto.request.LoginRequest;
 import com.refresh_token.auth.dto.request.RegistrationRequest;
+import com.refresh_token.auth.dto.response.LoginResponse;
 import com.refresh_token.auth.dto.response.RegistrationResponse;
 import com.refresh_token.auth.service.AuthService;
 import com.refresh_token.common.constants.ApiEndpoints;
@@ -22,7 +24,11 @@ public class AuthController {
 
     @PostMapping(ApiEndpoints.Auth.REGISTER)
     public ResponseEntity<ApiResponse<RegistrationResponse>> registration(@Valid @RequestBody RegistrationRequest registrationRequest) {
-        System.out.println("Controller reached");
         return ResponseEntity.status(HttpStatus.OK).body(authService.registration(registrationRequest));
+    }
+
+    @PostMapping(ApiEndpoints.Auth.LOGIN)
+    public ResponseEntity<ApiResponse<LoginResponse>> login (@Valid @RequestBody LoginRequest loginRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.login(loginRequest));
     }
 }

@@ -1,4 +1,8 @@
 package com.refresh_token.auth.dto.response;
 
-public class LoginResponse {
+public record LoginResponse (
+        String accessToken,
+        String refreshToken
+) {
+
 }

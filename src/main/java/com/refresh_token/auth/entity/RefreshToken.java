@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "builder")
+@Table(name = "refresh_token")
 public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +25,6 @@ public class RefreshToken {
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
-
-    private LocalDateTime issuedAt;
 
     @Builder.Default
     @Column(nullable = false)

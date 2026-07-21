@@ -9,6 +9,7 @@ public final class ApiMessages {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Success {
         public static final String USER_REGISTERED = "User registration successful";
+        public static final String USER_LOGGED_IN = "User logged in successful";
 
     }
 
