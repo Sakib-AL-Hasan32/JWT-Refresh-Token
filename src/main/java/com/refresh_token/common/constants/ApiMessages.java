@@ -11,6 +11,7 @@ public final class ApiMessages {
         public static final String USER_REGISTERED = "User registration successful";
         public static final String USER_LOGGED_IN = "User logged in successful";
 
+
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,6 +20,10 @@ public final class ApiMessages {
         public static final String USER_ALREADY_EXISTS = "User already exists";
         public static final String EMAIL_ALREADY_EXISTS = "Email already exists";
         public static final String ROLE_NOT_FOUND = "Role not found";
+        public static final String REFRESH_TOKEN_NOT_FOUND = "Refresh token not found";
+        public static final String REFRESH_TOKEN_REVOKED = "Refresh token is revoked";
+        public static final String REFRESH_TOKEN_EXPIRED = "Refresh token is expired";
+        public static final String USER_INACTIVATED = "User inactivated";
     }
 
 }

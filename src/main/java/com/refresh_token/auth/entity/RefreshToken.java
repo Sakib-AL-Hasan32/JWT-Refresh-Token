@@ -28,7 +28,7 @@ public class RefreshToken {
 
     @Builder.Default
     @Column(nullable = false)
-    private boolean revoked =  false;
+    private Boolean revoked =  false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

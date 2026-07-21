@@ -1,11 +1,15 @@
 package com.refresh_token.auth.service.impl;
 
 import com.refresh_token.auth.dto.request.LoginRequest;
+import com.refresh_token.auth.dto.request.RefreshTokenRequest;
 import com.refresh_token.auth.dto.request.RegistrationRequest;
 import com.refresh_token.auth.dto.response.LoginResponse;
+import com.refresh_token.auth.dto.response.RefreshTokenResponse;
 import com.refresh_token.auth.dto.response.RegistrationResponse;
+import com.refresh_token.auth.entity.RefreshToken;
 import com.refresh_token.auth.entity.Role;
 import com.refresh_token.auth.entity.User;
+import com.refresh_token.auth.repository.RefreshTokenRepository;
 import com.refresh_token.auth.repository.RoleRepository;
 import com.refresh_token.auth.repository.UserRepository;
 import com.refresh_token.auth.security.service.JwtTokenService;
@@ -32,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public ApiResponse<RegistrationResponse> registration(RegistrationRequest registrationRequest) {
@@ -79,6 +84,20 @@ public class AuthServiceImpl implements AuthService {
         return ApiResponse.<LoginResponse>builder()
                 .data(response)
                 .message(ApiMessages.Success.USER_LOGGED_IN)
+                .build();
+    }
+
+    @Override
+    public ApiResponse<RefreshTokenResponse> refresh(RefreshTokenRequest refreshTokenRequest) {
+        RefreshToken refreshToken = jwtTokenService.getValidRefreshToken(refreshTokenRequest.refreshToken());
+        refreshToken.setRevoked(Boolean.TRUE);
+        refreshTokenRepository.save(refreshToken);
+        User user = refreshToken.getUser();
+        String accessToken = jwtTokenService.generateAccessToken(user);
+        String newRefreshToken = jwtTokenService.generateRefreshToken(user);
+        RefreshTokenResponse response = new RefreshTokenResponse(accessToken, newRefreshToken);
+        return ApiResponse.<RefreshTokenResponse>builder()
+                .data(response)
                 .build();
     }
 }

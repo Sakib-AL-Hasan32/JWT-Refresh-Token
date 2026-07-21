@@ -5,6 +5,8 @@ import com.refresh_token.auth.entity.Role;
 import com.refresh_token.auth.entity.User;
 import com.refresh_token.auth.repository.RefreshTokenRepository;
 import com.refresh_token.auth.security.service.JwtTokenService;
+import com.refresh_token.common.constants.ApiMessages;
+import com.refresh_token.common.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -118,5 +120,21 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         } catch (NoSuchAlgorithmException exception) {
             throw new IllegalStateException("SHA-256 algorithm is not available.", exception);
         }
+    }
+
+    @Override
+    public RefreshToken getValidRefreshToken(String rawToken) {
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(generateHashToken(rawToken))
+                .orElseThrow(() -> new InvalidTokenException(ApiMessages.Error.REFRESH_TOKEN_NOT_FOUND));
+        if(refreshToken.isRevoked()) {
+            throw new InvalidTokenException(ApiMessages.Error.REFRESH_TOKEN_REVOKED);
+        }
+        if (refreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new InvalidTokenException(ApiMessages.Error.REFRESH_TOKEN_EXPIRED);
+        }
+        if (!(refreshToken.getUser().isEnabled())) {
+            throw new InvalidTokenException(ApiMessages.Error.USER_INACTIVATED);
+        }
+        return refreshToken;
     }
 }
