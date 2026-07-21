@@ -21,6 +21,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -48,27 +49,11 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(getSecretKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-        return claims.getSubject();
-    }
-
-    @Override
-    public boolean isValidToken(String token, UserDetails userDetails) {
-        return getUsernameFromToken(token).equals(userDetails.getUsername());
-    }
-
-    @Override
     public String generateAccessToken(User user) {
         Date issuedAt = new Date();
         Date expiresAt = new Date(issuedAt.getTime() + expiration.toMillis());
 
         Set<String> roleNames = new LinkedHashSet<>();
-
         for (Role role : user.getRoles()) {
             roleNames.add(role.getName());
         }
@@ -79,6 +64,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         );
 
         return Jwts.builder()
+                .id(java.util.UUID.randomUUID().toString())
                 .subject(user.getUsername())
                 .claims(jwtClaims)
                 .issuedAt(issuedAt)
@@ -123,6 +109,11 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
+    public boolean isValidToken(String token, UserDetails userDetails) {
+        return getUsernameFromToken(token).equals(userDetails.getUsername());
+    }
+
+    @Override
     public RefreshToken getValidRefreshToken(String rawToken) {
         RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(generateHashToken(rawToken))
                 .orElseThrow(() -> new InvalidTokenException(ApiMessages.Error.REFRESH_TOKEN_NOT_FOUND));
@@ -136,5 +127,39 @@ public class JwtTokenServiceImpl implements JwtTokenService {
             throw new InvalidTokenException(ApiMessages.Error.USER_INACTIVATED);
         }
         return refreshToken;
+    }
+
+    @Override
+    public String getUsernameFromToken(String token) {
+        Claims claims = extractClaims(token);
+        return claims.getSubject();
+    }
+
+    @Override
+    public Instant extractExpiration(String accessToken) {
+        Claims claims = extractClaims(accessToken);
+        return claims.getExpiration().toInstant();
+    }
+
+    @Override
+    public Boolean isTokenExpired(String bearerToken) {
+        return extractExpiration(bearerToken).isBefore(Instant.now());
+    }
+
+    @Override
+    public Claims extractClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    @Override
+    public String extractAccessToken(String bearerToken) {
+        if(bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            throw new InvalidTokenException(ApiMessages.Error.INVALID_TOKEN);
+        }
+        return bearerToken.substring(7);
     }
 }

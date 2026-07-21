@@ -1,5 +1,6 @@
 package com.refresh_token.auth.security.filter;
 
+import com.refresh_token.auth.repository.BlacklistedAccessTokenRepository;
 import com.refresh_token.auth.security.service.CustomUserDetailsService;
 import com.refresh_token.auth.security.service.JwtTokenService;
 import io.jsonwebtoken.JwtException;
@@ -22,6 +23,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtTokenService jwtTokenService;
+    private final BlacklistedAccessTokenRepository  blacklistedAccessTokenRepository;
 
     @Override
     @NullMarked
@@ -35,6 +37,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         String token = header.substring(7);
+        if(blacklistedAccessTokenRepository.existsByToken(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         try {
             String username = jwtTokenService.getUsernameFromToken(token);
             if (username != null) {
@@ -48,9 +54,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
-            filterChain.doFilter(request, response);
         } catch (JwtException e) {
             SecurityContextHolder.clearContext();
         }
+        filterChain.doFilter(request, response);
     }
 }

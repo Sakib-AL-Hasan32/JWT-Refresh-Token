@@ -13,10 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +32,16 @@ public class AuthController {
     }
 
     @PostMapping(ApiEndpoints.Auth.REFRESH)
-    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refresh(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(authService.refresh(refreshTokenRequest));
+    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refresh(
+            @RequestHeader(name = "Authorization") String bearerToken,
+            @Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.refresh(bearerToken, refreshTokenRequest));
+    }
+
+    @PostMapping(ApiEndpoints.Auth.LOGOUT)
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @RequestHeader(name = "Authorization") String bearerToken,
+            @Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.logout(bearerToken ,refreshTokenRequest));
     }
 }

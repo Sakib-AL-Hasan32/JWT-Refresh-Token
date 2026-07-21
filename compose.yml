@@ -8,9 +8,9 @@ services:
 
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: task_management_db
+      MYSQL_DATABASE: task_manager_db
       MYSQL_USER: sakib
-      MYSQL_PASSWORD: password
+      MYSQL_PASSWORD: 12345
 
     volumes:
       - mysql_data:/var/lib/mysql

@@ -6,9 +6,11 @@ import com.refresh_token.auth.dto.request.RegistrationRequest;
 import com.refresh_token.auth.dto.response.LoginResponse;
 import com.refresh_token.auth.dto.response.RefreshTokenResponse;
 import com.refresh_token.auth.dto.response.RegistrationResponse;
+import com.refresh_token.auth.entity.BlacklistedAccessToken;
 import com.refresh_token.auth.entity.RefreshToken;
 import com.refresh_token.auth.entity.Role;
 import com.refresh_token.auth.entity.User;
+import com.refresh_token.auth.repository.BlacklistedAccessTokenRepository;
 import com.refresh_token.auth.repository.RefreshTokenRepository;
 import com.refresh_token.auth.repository.RoleRepository;
 import com.refresh_token.auth.repository.UserRepository;
@@ -37,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final BlacklistedAccessTokenRepository  blacklistedAccessTokenRepository;
 
     @Override
     public ApiResponse<RegistrationResponse> registration(RegistrationRequest registrationRequest) {
@@ -88,16 +91,46 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApiResponse<RefreshTokenResponse> refresh(RefreshTokenRequest refreshTokenRequest) {
+    public ApiResponse<RefreshTokenResponse> refresh(String bearerToken, RefreshTokenRequest refreshTokenRequest) {
         RefreshToken refreshToken = jwtTokenService.getValidRefreshToken(refreshTokenRequest.refreshToken());
         refreshToken.setRevoked(Boolean.TRUE);
         refreshTokenRepository.save(refreshToken);
+        if (bearerToken != null) {
+            String accessToken = jwtTokenService.extractAccessToken(bearerToken);
+
+            if (!jwtTokenService.isTokenExpired(accessToken)) {
+
+                BlacklistedAccessToken token = new BlacklistedAccessToken();
+                token.setToken(accessToken);
+                token.setExpiresAt(jwtTokenService.extractExpiration(accessToken));
+
+                blacklistedAccessTokenRepository.save(token);
+            }
+        }
         User user = refreshToken.getUser();
         String accessToken = jwtTokenService.generateAccessToken(user);
         String newRefreshToken = jwtTokenService.generateRefreshToken(user);
         RefreshTokenResponse response = new RefreshTokenResponse(accessToken, newRefreshToken);
+
         return ApiResponse.<RefreshTokenResponse>builder()
                 .data(response)
+                .build();
+    }
+
+    @Override
+    public ApiResponse<Void> logout(String bearerToken ,RefreshTokenRequest refreshTokenRequest) {
+        RefreshToken refreshToken = jwtTokenService.getValidRefreshToken(refreshTokenRequest.refreshToken());
+        refreshToken.setRevoked(Boolean.TRUE);
+        refreshTokenRepository.save(refreshToken);
+
+        String accessToken = jwtTokenService.extractAccessToken(bearerToken);
+        BlacklistedAccessToken blacklistedAccessToken = new BlacklistedAccessToken();
+        blacklistedAccessToken.setToken(accessToken);
+        blacklistedAccessToken.setExpiresAt(jwtTokenService.extractExpiration(accessToken));
+        blacklistedAccessTokenRepository.save(blacklistedAccessToken);
+
+        return ApiResponse.<Void>builder()
+                .message(ApiMessages.Success.USER_LOGGED_OUT)
                 .build();
     }
 }
