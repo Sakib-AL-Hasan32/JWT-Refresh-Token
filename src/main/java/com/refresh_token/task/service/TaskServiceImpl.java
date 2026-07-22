@@ -12,7 +12,6 @@ import com.refresh_token.task.entity.Task;
 import com.refresh_token.task.enums.TaskStatus;
 import com.refresh_token.task.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -47,6 +46,7 @@ public class TaskServiceImpl implements TaskService {
                 .build();
         taskRepository.save(task);
         TaskResponse response = new TaskResponse(
+                task.getId(),
                 task.getName(),
                 task.getDescription(),
                 task.getStatus(),
@@ -60,6 +60,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionNames.GET_ALL_TASK + "')")
     public ApiResponse<List<TaskResponse>> getAllTask(UserDetails userDetails) {
         List<Task> tasks = taskRepository.findAllByCreatedByUsername(userDetails.getUsername());
         if(tasks.isEmpty()) {
@@ -71,6 +72,7 @@ public class TaskServiceImpl implements TaskService {
         List<TaskResponse> response = new ArrayList<>();
         for (Task task : tasks) {
             response.add(new TaskResponse(
+                    task.getId(),
                     task.getName(),
                     task.getDescription(),
                     task.getStatus(),
@@ -85,6 +87,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionNames.GET_TASK_BY_NAME + "')")
     public ApiResponse<List<TaskResponse>> getTaskByName(UserDetails userDetails, FindByName taskName) {
         List<Task> tasks = taskRepository.findByCreatedByUsernameAndNameContainingIgnoreCase(userDetails.getUsername(), taskName.name());
         if (tasks.isEmpty()) {
@@ -96,6 +99,7 @@ public class TaskServiceImpl implements TaskService {
         List<TaskResponse> response = new ArrayList<>();
         for (Task task : tasks) {
             response.add(new TaskResponse(
+                    task.getId(),
                     task.getName(),
                     task.getDescription(),
                     task.getStatus(),
@@ -106,6 +110,30 @@ public class TaskServiceImpl implements TaskService {
         return ApiResponse.<List<TaskResponse>>builder()
                 .data(response)
                 .message(ApiMessages.Success.FETCHED_TASK_BY_NAME)
+                .build();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionNames.UPDATE_TASK + "')")
+    public ApiResponse<TaskResponse> updateTask(UserDetails userDetails, TaskRequest taskRequest, Long id) {
+        Task task = taskRepository.findByCreatedByUsernameAndId(userDetails.getUsername(), id)
+                .orElseThrow(() -> new IllegalArgumentException(ApiMessages.Error.TASK_NOT_FOUND));
+        task.setName(taskRequest.name());
+        task.setDescription(taskRequest.description());
+        task.setPriority(taskRequest.priority());
+        task.setDueDate(taskRequest.dueDate());
+        taskRepository.save(task);
+        TaskResponse response = new TaskResponse(
+                task.getId(),
+                task.getName(),
+                task.getDescription(),
+                task.getStatus(),
+                task.getPriority(),
+                task.getDueDate()
+        );
+        return ApiResponse.<TaskResponse>builder()
+                .data(response)
+                .message(ApiMessages.Success.TASK_UPDATED)
                 .build();
     }
 }

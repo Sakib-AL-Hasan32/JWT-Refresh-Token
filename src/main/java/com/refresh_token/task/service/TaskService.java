@@ -12,4 +12,5 @@ public interface TaskService {
     ApiResponse<TaskResponse> createTask(TaskRequest taskRequest, UserDetails userDetails);
     ApiResponse<List<TaskResponse>> getAllTask(UserDetails userDetails);
     ApiResponse<List<TaskResponse>> getTaskByName(UserDetails userDetails, FindByName taskName);
+    ApiResponse<TaskResponse> updateTask(UserDetails userDetails, TaskRequest taskRequest, Long id);
 }

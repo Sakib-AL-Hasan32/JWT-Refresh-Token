@@ -38,4 +38,11 @@ public class TaskController {
                                                                          @Valid @RequestBody FindByName taskName) {
         return ResponseEntity.status(HttpStatus.OK).body(taskService.getTaskByName(userDetails, taskName));
     }
+
+    @PostMapping(ApiEndpoints.Task.UPDATE)
+    public ResponseEntity<ApiResponse<TaskResponse>> updateTask(@AuthenticationPrincipal UserDetails userDetails,
+                                                                @PathVariable Long id,
+                                                                @Valid @RequestBody TaskRequest taskRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(taskService.updateTask(userDetails, taskRequest, id));
+    }
 }

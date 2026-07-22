@@ -22,6 +22,7 @@ public final class ApiEndpoints {
         public static final String CREATE = "/create";
         public static final String GET_ALL = "/getAll";
         public static final String GET_BY_NAME = "/getByName";
+        public static final String UPDATE = "/update/{id}";
     }
 
 }

@@ -6,6 +6,7 @@ import com.refresh_token.task.enums.TaskStatus;
 import java.time.LocalDate;
 
 public record TaskResponse(
+        Long id,
         String name,
         String description,
         TaskStatus status,

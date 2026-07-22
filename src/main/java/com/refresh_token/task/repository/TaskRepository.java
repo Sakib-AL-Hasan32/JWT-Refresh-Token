@@ -3,6 +3,7 @@ package com.refresh_token.task.repository;
 import com.refresh_token.auth.entity.User;
 import com.refresh_token.task.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,4 +15,5 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     boolean existsByNameAndCreatedBy(String name, User createdBy);
     List<Task> findByCreatedByUsernameAndNameContainingIgnoreCase(String username, String name);
     List<Task> findAllByCreatedByUsername(String username);
+    Optional<Task> findByCreatedByUsernameAndId(String username, Long id);
 }
