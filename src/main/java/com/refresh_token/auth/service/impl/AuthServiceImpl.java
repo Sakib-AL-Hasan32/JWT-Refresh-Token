@@ -43,14 +43,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ApiResponse<RegistrationResponse> registration(RegistrationRequest registrationRequest) {
+
         if (userRepository.existsByUsername(registrationRequest.username())) {
             throw new UsernameNotFoundException(ApiMessages.Error.USER_ALREADY_EXISTS);
         }
         if (userRepository.existsByEmail(registrationRequest.email())) {
             throw new UsernameNotFoundException(ApiMessages.Error.EMAIL_ALREADY_EXISTS);
         }
+
         Role role = roleRepository.findByName(RoleNames.USER)
                 .orElseThrow(() -> new UsernameNotFoundException(ApiMessages.Error.ROLE_NOT_FOUND));
+
         User user = User.builder()
                 .username(registrationRequest.username())
                 .email(registrationRequest.email())
@@ -60,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
                 .roles(new LinkedHashSet<>(Set.of(role)))
                 .build();
         userRepository.save(user);
+
         RegistrationResponse response = new RegistrationResponse(
                 user.getId(),
                 user.getUsername(),
@@ -68,6 +72,7 @@ public class AuthServiceImpl implements AuthService {
                 user.getFirstName(),
                 user.getLastName()
         );
+
         return ApiResponse.<RegistrationResponse>builder()
                 .data(response)
                 .message(ApiMessages.Success.USER_REGISTERED)
@@ -76,14 +81,28 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ApiResponse<LoginResponse> login(LoginRequest loginRequest) {
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
+
         String username = authentication.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(ApiMessages.Error.USER_NOT_FOUND));
+
         String accessToken = jwtTokenService.generateAccessToken(user);
         String refreshToken = jwtTokenService.generateRefreshToken(user);
-        LoginResponse response = new LoginResponse(accessToken, refreshToken);
+
+        Set<String> roles = new LinkedHashSet<>();
+        for (Role role : user.getRoles()) {
+            roles.add(role.getName());
+        }
+
+        LoginResponse response = new LoginResponse(
+                user.getUsername(),
+                roles,
+                accessToken,
+                refreshToken);
+
         return ApiResponse.<LoginResponse>builder()
                 .data(response)
                 .message(ApiMessages.Success.USER_LOGGED_IN)
@@ -92,9 +111,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ApiResponse<RefreshTokenResponse> refresh(String bearerToken, RefreshTokenRequest refreshTokenRequest) {
+
         RefreshToken refreshToken = jwtTokenService.getValidRefreshToken(refreshTokenRequest.refreshToken());
         refreshToken.setRevoked(Boolean.TRUE);
         refreshTokenRepository.save(refreshToken);
+
         if (bearerToken != null) {
             String accessToken = jwtTokenService.extractAccessToken(bearerToken);
 
@@ -107,6 +128,7 @@ public class AuthServiceImpl implements AuthService {
                 blacklistedAccessTokenRepository.save(token);
             }
         }
+
         User user = refreshToken.getUser();
         String accessToken = jwtTokenService.generateAccessToken(user);
         String newRefreshToken = jwtTokenService.generateRefreshToken(user);
@@ -119,6 +141,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ApiResponse<Void> logout(String bearerToken ,RefreshTokenRequest refreshTokenRequest) {
+
         RefreshToken refreshToken = jwtTokenService.getValidRefreshToken(refreshTokenRequest.refreshToken());
         refreshToken.setRevoked(Boolean.TRUE);
         refreshTokenRepository.save(refreshToken);

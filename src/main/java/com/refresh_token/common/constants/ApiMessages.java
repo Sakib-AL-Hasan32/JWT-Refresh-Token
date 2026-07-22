@@ -11,7 +11,7 @@ public final class ApiMessages {
         public static final String USER_REGISTERED = "User registration successful";
         public static final String USER_LOGGED_IN = "User logged in successful";
         public static final String USER_LOGGED_OUT = "User logged out successful";
-
+        public static final String TASK_CREATED = "Task created successful";
 
     }
 
@@ -26,6 +26,7 @@ public final class ApiMessages {
         public static final String REFRESH_TOKEN_EXPIRED = "Refresh token is expired";
         public static final String USER_INACTIVATED = "User inactivated";
         public static final String INVALID_TOKEN = "Invalid Token";
+        public static final String TASK_ALREADY_EXIST = "Task already exists";
     }
 
 }

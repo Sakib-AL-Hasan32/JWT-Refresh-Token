@@ -27,11 +27,14 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String @NonNull ... args) throws Exception {
 
         Permission profileRead = createPermissionIfNotExists(PermissionNames.PROFILE_READ);
+        Permission createTask = createPermissionIfNotExists(PermissionNames.CREATE_TASK);
 
         Role userRole = createRoleIfNotExists(RoleNames.USER);
 
         assignPermission(userRole, profileRead);
+        assignPermission(userRole, createTask);
     }
+
     private Role createRoleIfNotExists(String roleName) {
         return roleRepository.findByName(roleName)
                 .orElseGet(() ->
