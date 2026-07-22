@@ -12,6 +12,7 @@ public final class ApiMessages {
         public static final String USER_LOGGED_IN = "User logged in successful";
         public static final String USER_LOGGED_OUT = "User logged out successful";
         public static final String TASK_CREATED = "Task created successful";
+        public static final String FETCHED_ALL_TASKS = "Fetched all tasks";
 
     }
 

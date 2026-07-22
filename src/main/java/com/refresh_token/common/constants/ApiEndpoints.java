@@ -20,6 +20,7 @@ public final class ApiEndpoints {
     public static final class Task {
         public static final String BASE = API_VERSION + "/task";
         public static final String CREATE = "/create";
+        public static final String GET_ALL = "/getAll";
     }
 
 }

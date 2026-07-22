@@ -11,10 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +25,10 @@ public class TaskController {
     public ResponseEntity<ApiResponse<TaskResponse>> createTask(@Valid @RequestBody TaskRequest taskRequest,
                                                                 @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskRequest, userDetails));
+    }
+
+    @GetMapping(ApiEndpoints.Task.GET_ALL)
+    public ResponseEntity<ApiResponse<List<TaskResponse>>> getAllTasks() {
+        return ResponseEntity.status(HttpStatus.OK).body(taskService.getAllTask());
     }
 }

@@ -28,11 +28,13 @@ public class DataInitializer implements CommandLineRunner {
 
         Permission profileRead = createPermissionIfNotExists(PermissionNames.PROFILE_READ);
         Permission createTask = createPermissionIfNotExists(PermissionNames.CREATE_TASK);
+        Permission getAllTask = createPermissionIfNotExists(PermissionNames.GET_ALL_TASK);
 
         Role userRole = createRoleIfNotExists(RoleNames.USER);
 
         assignPermission(userRole, profileRead);
         assignPermission(userRole, createTask);
+        assignPermission(userRole, getAllTask);
     }
 
     private Role createRoleIfNotExists(String roleName) {

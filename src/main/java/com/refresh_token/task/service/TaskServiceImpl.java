@@ -16,6 +16,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
@@ -50,6 +53,26 @@ public class TaskServiceImpl implements TaskService {
         return ApiResponse.<TaskResponse>builder()
                 .data(response)
                 .message(ApiMessages.Success.TASK_CREATED)
+                .build();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionNames.GET_ALL_TASK + "')")
+    public ApiResponse<List<TaskResponse>> getAllTask() {
+        List<Task> tasks = taskRepository.findAll();
+        List<TaskResponse> response = new ArrayList<>();
+        for (Task task : tasks) {
+            response.add(new TaskResponse(
+                    task.getName(),
+                    task.getDescription(),
+                    task.getStatus(),
+                    task.getPriority(),
+                    task.getDueDate()
+            ));
+        }
+        return ApiResponse.<List<TaskResponse>>builder()
+                .data(response)
+                .message(ApiMessages.Success.FETCHED_ALL_TASKS)
                 .build();
     }
 }
