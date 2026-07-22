@@ -5,18 +5,21 @@ import com.refresh_token.auth.repository.UserRepository;
 import com.refresh_token.common.constants.ApiMessages;
 import com.refresh_token.common.constants.PermissionNames;
 import com.refresh_token.common.response.ApiResponse;
+import com.refresh_token.task.dto.request.FindByName;
 import com.refresh_token.task.dto.request.TaskRequest;
 import com.refresh_token.task.dto.response.TaskResponse;
 import com.refresh_token.task.entity.Task;
 import com.refresh_token.task.enums.TaskStatus;
 import com.refresh_token.task.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -57,9 +60,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('" + PermissionNames.GET_ALL_TASK + "')")
-    public ApiResponse<List<TaskResponse>> getAllTask() {
-        List<Task> tasks = taskRepository.findAll();
+    public ApiResponse<List<TaskResponse>> getAllTask(UserDetails userDetails) {
+        List<Task> tasks = taskRepository.findAllByCreatedByUsername(userDetails.getUsername());
+        if(tasks.isEmpty()) {
+            return ApiResponse.<List<TaskResponse>>builder()
+                    .data(Collections.emptyList())
+                    .message(ApiMessages.Error.NO_TASK_FOUND)
+                    .build();
+        }
         List<TaskResponse> response = new ArrayList<>();
         for (Task task : tasks) {
             response.add(new TaskResponse(
@@ -73,6 +81,31 @@ public class TaskServiceImpl implements TaskService {
         return ApiResponse.<List<TaskResponse>>builder()
                 .data(response)
                 .message(ApiMessages.Success.FETCHED_ALL_TASKS)
+                .build();
+    }
+
+    @Override
+    public ApiResponse<List<TaskResponse>> getTaskByName(UserDetails userDetails, FindByName taskName) {
+        List<Task> tasks = taskRepository.findByCreatedByUsernameAndNameContainingIgnoreCase(userDetails.getUsername(), taskName.name());
+        if (tasks.isEmpty()) {
+            return ApiResponse.<List<TaskResponse>>builder()
+                    .data(Collections.emptyList())
+                    .message(ApiMessages.Error.TASK_NOT_FOUND)
+                    .build();
+        }
+        List<TaskResponse> response = new ArrayList<>();
+        for (Task task : tasks) {
+            response.add(new TaskResponse(
+                    task.getName(),
+                    task.getDescription(),
+                    task.getStatus(),
+                    task.getPriority(),
+                    task.getDueDate()
+            ));
+        }
+        return ApiResponse.<List<TaskResponse>>builder()
+                .data(response)
+                .message(ApiMessages.Success.FETCHED_TASK_BY_NAME)
                 .build();
     }
 }

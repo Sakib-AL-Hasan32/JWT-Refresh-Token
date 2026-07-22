@@ -13,6 +13,7 @@ public final class ApiMessages {
         public static final String USER_LOGGED_OUT = "User logged out successful";
         public static final String TASK_CREATED = "Task created successful";
         public static final String FETCHED_ALL_TASKS = "Fetched all tasks";
+        public static final String FETCHED_TASK_BY_NAME = "Fetched task by name";
 
     }
 
@@ -28,6 +29,8 @@ public final class ApiMessages {
         public static final String USER_INACTIVATED = "User inactivated";
         public static final String INVALID_TOKEN = "Invalid Token";
         public static final String TASK_ALREADY_EXIST = "Task already exists";
+        public static final String TASK_NOT_FOUND = "Task not found";
+        public static final String NO_TASK_FOUND = "No task found";
     }
 
 }

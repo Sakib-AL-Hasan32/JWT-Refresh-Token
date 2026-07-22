@@ -8,4 +8,5 @@ public final class PermissionNames {
     public static final String PROFILE_READ = "PROFILE_READ";
     public static final String CREATE_TASK = "CREATE_TASK";
     public static final String GET_ALL_TASK = "GET_ALL_TASK";
+    public static final String GET_TASK_BY_NAME = "GET_TASK_BY_NAME";
 }
