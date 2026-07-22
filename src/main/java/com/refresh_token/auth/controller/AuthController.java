@@ -32,10 +32,8 @@ public class AuthController {
     }
 
     @PostMapping(ApiEndpoints.Auth.REFRESH)
-    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refresh(
-            @RequestHeader(name = "Authorization") String bearerToken,
-            @Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(authService.refresh(bearerToken, refreshTokenRequest));
+    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refresh(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.refresh(refreshTokenRequest));
     }
 
     @PostMapping(ApiEndpoints.Auth.LOGOUT)

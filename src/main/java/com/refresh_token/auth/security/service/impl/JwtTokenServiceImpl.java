@@ -8,6 +8,7 @@ import com.refresh_token.auth.security.service.JwtTokenService;
 import com.refresh_token.common.constants.ApiMessages;
 import com.refresh_token.common.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -142,8 +143,12 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public Boolean isTokenExpired(String bearerToken) {
-        return extractExpiration(bearerToken).isBefore(Instant.now());
+    public Boolean isTokenExpired(String accessToken) {
+        try {
+            return extractExpiration(accessToken).isBefore(Instant.now());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 
     @Override

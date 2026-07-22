@@ -18,5 +18,5 @@ public interface JwtTokenService {
     String extractAccessToken(String bearerToken);
     Claims extractClaims(String bearerToken);
     Instant extractExpiration(String accessToken);
-    Boolean isTokenExpired(String bearerToken);
+    Boolean isTokenExpired(String accessToken);
 }

@@ -11,6 +11,6 @@ import com.refresh_token.common.response.ApiResponse;
 public interface AuthService {
     ApiResponse<RegistrationResponse>  registration(RegistrationRequest registrationRequest);
     ApiResponse<LoginResponse> login(LoginRequest loginRequest);
-    ApiResponse<RefreshTokenResponse> refresh(String bearerToken, RefreshTokenRequest refreshTokenRequest);
+    ApiResponse<RefreshTokenResponse> refresh(RefreshTokenRequest refreshTokenRequest);
     ApiResponse<Void> logout(String bearerToken, RefreshTokenRequest refreshTokenRequest);
 }

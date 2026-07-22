@@ -110,24 +110,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApiResponse<RefreshTokenResponse> refresh(String bearerToken, RefreshTokenRequest refreshTokenRequest) {
+    public ApiResponse<RefreshTokenResponse> refresh(RefreshTokenRequest refreshTokenRequest) {
 
         RefreshToken refreshToken = jwtTokenService.getValidRefreshToken(refreshTokenRequest.refreshToken());
         refreshToken.setRevoked(Boolean.TRUE);
         refreshTokenRepository.save(refreshToken);
 
-        if (bearerToken != null) {
-            String accessToken = jwtTokenService.extractAccessToken(bearerToken);
+        if (!jwtTokenService.isTokenExpired(refreshTokenRequest.accessToken())) {
 
-            if (!jwtTokenService.isTokenExpired(accessToken)) {
+            BlacklistedAccessToken token = new BlacklistedAccessToken();
+            token.setToken(refreshTokenRequest.accessToken());
+            token.setExpiresAt(jwtTokenService.extractExpiration(refreshTokenRequest.accessToken()));
 
-                BlacklistedAccessToken token = new BlacklistedAccessToken();
-                token.setToken(accessToken);
-                token.setExpiresAt(jwtTokenService.extractExpiration(accessToken));
-
-                blacklistedAccessTokenRepository.save(token);
-            }
+            blacklistedAccessTokenRepository.save(token);
         }
+
 
         User user = refreshToken.getUser();
         String accessToken = jwtTokenService.generateAccessToken(user);
