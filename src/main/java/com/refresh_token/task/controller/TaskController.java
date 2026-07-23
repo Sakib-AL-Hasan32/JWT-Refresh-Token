@@ -45,4 +45,10 @@ public class TaskController {
                                                                 @Valid @RequestBody TaskRequest taskRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(taskService.updateTask(userDetails, taskRequest, id));
     }
+
+    @DeleteMapping(ApiEndpoints.Task.DELETE)
+    public ResponseEntity<ApiResponse<TaskResponse>> deleteTask(@AuthenticationPrincipal UserDetails userDetails,
+                                                        @PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(taskService.deleteTask(userDetails, id));
+    }
 }

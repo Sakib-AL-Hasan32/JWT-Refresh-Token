@@ -15,6 +15,7 @@ public final class ApiMessages {
         public static final String FETCHED_ALL_TASKS = "Fetched all tasks";
         public static final String FETCHED_TASK_BY_NAME = "Fetched task by name";
         public static final String TASK_UPDATED = "Task updated successful";
+        public static final String TASK_DELETED = "Task deleted successful";
 
     }
 

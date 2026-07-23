@@ -136,4 +136,15 @@ public class TaskServiceImpl implements TaskService {
                 .message(ApiMessages.Success.TASK_UPDATED)
                 .build();
     }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionNames.DELETE_TASK + "')")
+    public ApiResponse<TaskResponse> deleteTask(UserDetails userDetails, Long id) {
+        Task task = taskRepository.findByCreatedByUsernameAndId(userDetails.getUsername(), id)
+                .orElseThrow(() -> new IllegalArgumentException(ApiMessages.Error.TASK_NOT_FOUND));
+        taskRepository.delete(task);
+        return ApiResponse.<TaskResponse>builder()
+                .message(ApiMessages.Success.TASK_DELETED)
+                .build();
+    }
 }

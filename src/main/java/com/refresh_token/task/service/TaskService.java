@@ -13,4 +13,5 @@ public interface TaskService {
     ApiResponse<List<TaskResponse>> getAllTask(UserDetails userDetails);
     ApiResponse<List<TaskResponse>> getTaskByName(UserDetails userDetails, FindByName taskName);
     ApiResponse<TaskResponse> updateTask(UserDetails userDetails, TaskRequest taskRequest, Long id);
+    ApiResponse<TaskResponse> deleteTask(UserDetails userDetails, Long id);
 }
